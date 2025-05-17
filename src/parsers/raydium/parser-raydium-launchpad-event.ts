@@ -85,11 +85,12 @@ export class RaydiumLaunchpadEventParser {
   private decodeTradeInstruction(data: Buffer, options: any): RaydiumLCPTradeEvent {
     const eventInstruction = this.adapter.getInnerInstruction(
       options.outerIndex,
-      options.innerIndex ? options.innerIndex + 1 : 0
+      options.innerIndex == undefined ? 0 : options.innerIndex + 1
     ); // find inner instruction
     if (!eventInstruction) {
       throw new Error('Event instruction not found');
     }
+
     // get event data from inner instruction
     const eventData = getInstructionData(eventInstruction).slice(16);
     const layout = deserializeUnchecked(RaydiumLCPTradeLayout.schema, RaydiumLCPTradeLayout, Buffer.from(eventData));

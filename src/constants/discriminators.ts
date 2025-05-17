@@ -94,6 +94,11 @@ export const DISCRIMINATORS = {
     OTHERS: {
       claimFee: new Uint8Array([169, 32, 79, 137, 136, 232, 70, 137]), //claimFee
     },
+    LIQUIDITY_EVENT: {
+      compositionFeeEvent: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 128, 151, 123, 106, 17, 102, 113, 142]), //CompositionFee
+      addLiquidityEvent: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 31, 94, 125, 90, 227, 52, 61, 186]), //AddLiquidity
+      removeLiquidityEvent: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 151, 113, 115, 164, 224, 159, 112, 193,]), //RemoveLiquidity
+    },
   },
   METEORA_POOLS: {
     CREATE: new Uint8Array([7, 166, 138, 171, 206, 171, 236, 244]), // initializePermissionlessConstantProductPoolWithConfig

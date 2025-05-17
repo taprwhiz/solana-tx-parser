@@ -38,10 +38,14 @@ export class MeteoraParser extends BaseParser {
       .flatMap((it) => Object.values(it))
       .some((it) => instructionType.equals(it));
 
+    const isDLMMLiquidityEvent = Object.values(DISCRIMINATORS.METEORA_DLMM.LIQUIDITY_EVENT).some((it) =>
+      data.slice(0, 16).equals(it)
+    );
+
     const isPoolsLiquidity = Object.values(DISCRIMINATORS.METEORA_POOLS).some((it) => instructionType.equals(it));
 
     const isDAMMLiquidity = Object.values(DISCRIMINATORS.METEORA_DAMM).some((it) => instructionType.equals(it));
 
-    return !isDLMMLiquidity && !isPoolsLiquidity && !isDAMMLiquidity;
+    return !isDLMMLiquidity && !isDLMMLiquidityEvent && !isPoolsLiquidity && !isDAMMLiquidity;
   }
 }
