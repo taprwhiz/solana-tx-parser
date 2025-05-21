@@ -32,20 +32,18 @@ export class MeteoraParser extends BaseParser {
     const data = getInstructionData(instruction);
     if (!data) return true;
 
-    const instructionType = data.slice(0, 8);
-
     const isDLMMLiquidity = Object.values(DISCRIMINATORS.METEORA_DLMM)
       .flatMap((it) => Object.values(it))
-      .some((it) => instructionType.equals(it));
+      .some((it) => data.slice(0, it.length).equals(it));
 
-    const isDLMMLiquidityEvent = Object.values(DISCRIMINATORS.METEORA_DLMM.LIQUIDITY_EVENT).some((it) =>
-      data.slice(0, 16).equals(it)
+    const isPoolsLiquidity = Object.values(DISCRIMINATORS.METEORA_POOLS).some((it) =>
+      data.slice(0, it.length).equals(it)
     );
 
-    const isPoolsLiquidity = Object.values(DISCRIMINATORS.METEORA_POOLS).some((it) => instructionType.equals(it));
+    const isDAMMLiquidity = Object.values(DISCRIMINATORS.METEORA_DAMM).some((it) =>
+      data.slice(0, it.length).equals(it)
+    );
 
-    const isDAMMLiquidity = Object.values(DISCRIMINATORS.METEORA_DAMM).some((it) => instructionType.equals(it));
-
-    return !isDLMMLiquidity && !isDLMMLiquidityEvent && !isPoolsLiquidity && !isDAMMLiquidity;
+    return !isDLMMLiquidity && !isPoolsLiquidity && !isDAMMLiquidity;
   }
 }

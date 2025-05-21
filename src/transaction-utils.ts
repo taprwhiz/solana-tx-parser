@@ -1,4 +1,4 @@
-import { DEX_PROGRAMS, SYSTEM_PROGRAMS, TOKENS } from './constants';
+import { DEX_PROGRAMS, FEE_ACCOUNTS, SYSTEM_PROGRAMS, TOKENS } from './constants';
 import { InstructionClassifier } from './instruction-classifier';
 import { TransactionAdapter } from './transaction-adapter';
 import {
@@ -275,9 +275,9 @@ export class TransactionUtils {
     }
 
     const signer = this.getSwapSigner();
-    const { inputToken, outputToken } = this.calculateTokenAmounts(signer, transfers, uniqueTokens);
+    const { inputToken, outputToken, feeTransfer } = this.calculateTokenAmounts(signer, transfers, uniqueTokens);
 
-    return {
+    const trade = {
       type: getTradeType(inputToken.mint, outputToken.mint),
       inputToken,
       outputToken,
@@ -289,7 +289,18 @@ export class TransactionUtils {
       timestamp: this.adapter.blockTime || 0,
       signature: this.adapter.signature,
       idx: transfers[0].idx,
-    };
+    } as TradeInfo;
+
+    if (feeTransfer) {
+      trade.fee = {
+        mint: feeTransfer.info.mint,
+        amount: feeTransfer.info.tokenAmount.uiAmount,
+        amountRaw: feeTransfer.info.tokenAmount.amount,
+        decimals: feeTransfer.info.tokenAmount.decimals,
+      };
+    }
+
+    return trade;
   }
 
   /**
@@ -333,19 +344,24 @@ export class TransactionUtils {
       [inputToken, outputToken] = [outputToken, inputToken];
     }
 
-    const amounts = this.sumTokenAmounts(transfers, inputToken.mint, outputToken.mint);
+    const { inputAmount, inputAmountRaw, outputAmount, outputAmountRaw, feeTransfer } = this.sumTokenAmounts(
+      transfers,
+      inputToken.mint,
+      outputToken.mint
+    );
 
     return {
       inputToken: {
         ...inputToken,
-        amount: amounts.inputAmount,
-        amountRaw: amounts.inputAmountRaw.toString(),
+        amount: inputAmount,
+        amountRaw: inputAmountRaw.toString(),
       } as TokenInfo,
       outputToken: {
         ...outputToken,
-        amount: amounts.outputAmount,
-        amountRaw: amounts.outputAmountRaw.toString(),
+        amount: outputAmount,
+        amountRaw: outputAmountRaw.toString(),
       },
+      feeTransfer,
     };
   }
 
@@ -358,10 +374,17 @@ export class TransactionUtils {
     let outputAmount: number = 0;
     let inputAmountRaw: bigint = 0n;
     let outputAmountRaw: bigint = 0n;
+    let feeTransfer: TransferData | undefined;
 
     transfers.forEach((transfer) => {
       const tokenInfo = this.getTransferTokenInfo(transfer);
       if (!tokenInfo) return;
+
+      const destination = tokenInfo.destinationOwner || tokenInfo.destination || '';
+      if (FEE_ACCOUNTS.includes(destination)) {
+        feeTransfer = transfer;
+        return; // skip fee transfer
+      }
 
       const key = `${tokenInfo.amount}-${tokenInfo.mint}`;
       if (seenTransfers.has(key)) return;
@@ -377,7 +400,7 @@ export class TransactionUtils {
       }
     });
 
-    return { inputAmount, inputAmountRaw, outputAmount, outputAmountRaw };
+    return { inputAmount, inputAmountRaw, outputAmount, outputAmountRaw, feeTransfer };
   }
 
   /**

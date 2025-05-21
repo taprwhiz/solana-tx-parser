@@ -1,5 +1,5 @@
 import { deserializeUnchecked } from 'borsh';
-import { DEX_PROGRAMS, DISCRIMINATORS } from '../../constants';
+import { DEX_PROGRAMS, DISCRIMINATORS, TOKENS } from '../../constants';
 import { convertToUiAmount, JupiterSwapEventData, JupiterSwapInfo, TradeInfo } from '../../types';
 import { getFinalSwap, getInstructionData, getProgramName, getTradeType } from '../../utils';
 import { BaseParser } from '../base-parser';
@@ -22,6 +22,7 @@ export class JupiterParser extends BaseParser {
     });
 
     const finalTrade = getFinalSwap(trades);
+    this.processFee(finalTrade);
 
     return finalTrade ? [finalTrade] : [];
   }
@@ -148,5 +149,33 @@ export class JupiterParser extends BaseParser {
 
   private containsDCAProgram(): boolean {
     return this.adapter.accountKeys.some((key) => key === DEX_PROGRAMS.JUPITER_DCA.id);
+  }
+
+  private processFee(trade: TradeInfo | null) {
+    if (trade && !trade.fee) {
+      const mint = trade.outputToken.mint;
+
+      const token =
+        mint == TOKENS.SOL
+          ? this.adapter.getAccountSolBalanceChanges(true).get(trade.user)
+          : this.adapter.getAccountTokenBalanceChanges(true).get(trade.user)?.get(mint);
+
+      if (token) {
+        const feeAmount = BigInt(trade.outputToken.amountRaw) - BigInt(token.change.amount);
+        if (feeAmount > 0n) {
+          const feeUiAmount = convertToUiAmount(feeAmount, trade.outputToken.decimals);
+          // add fee
+          trade.fee = {
+            mint,
+            amount: feeUiAmount,
+            amountRaw: feeAmount.toString(),
+            decimals: trade.outputToken.decimals,
+          };
+          // update outAmount
+          trade.outputToken.amount = token.change.uiAmount || 0;
+          trade.outputToken.amountRaw = token.change.amount;
+        }
+      }
+    }
   }
 }

@@ -5,6 +5,11 @@ export const DEX_PROGRAMS = {
     name: 'Jupiter',
     tags: ['route'],
   },
+  JUPITER_V2: {
+    id: 'JUP2jxvXaqu7NQY1GmNF4m1vodw12LVXYxbFL2uJvfo',
+    name: 'JupiterV2',
+    tags: ['route'],
+  },
   JUPITER_V4: {
     id: 'JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB',
     name: 'JupiterV4',
@@ -116,6 +121,11 @@ export const DEX_PROGRAMS = {
     id: 'cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG',
     name: 'MeteoraDammV2',
     tags: ['amm'],
+  },
+  SERUM_V3: {
+    id: '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin',
+    name: 'SerumV3',
+    tags: ['amm', 'vault'],
   },
 
   // Vault Programs
@@ -279,6 +289,8 @@ export const FEE_ACCOUNTS = [
   'DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL', // Jitotip 7
   '3AVi9Tg9Uo68tJfuvoKvqKNWKkC5wPdSSdeBnizKZ6jT', // Jitotip 8
 
+  '45ruCyfdRkWpRNGEqWzjCiXRHkZs8WXCLQ67Pnpye7Hp', // Jupiter Partner Referral Fee Vault
+
   '39azUYFWPz3VHgKCf3VChUwbpURdCHRxjWVowf5jUJjg', // Pumpfun Migrator
   'FWsW1xNtWscwNmKv6wVsU1iTzRN6wmmk3MjxRP5tT7hz', // PumpfunAMM Fee1
   'G5UZAVbAf46s7cKWoyKu8kYTip9DGTpbLZ2qa9Aq69dP', // PumpfunAMM Fee2
@@ -290,4 +302,6 @@ export const FEE_ACCOUNTS = [
   'JCRGumoE9Qi5BBgULTgdgTLjSgkCMSbF62ZZfGs84JeU', // PumpfunAMM Fee8
 
   'AVUCZyuT35YSuj4RH7fwiyPu82Djn2Hfg7y2ND2XcnZH', // Photon Fee Vault
+
+  'BUX7s2ef2htTGb2KKoPHWkmzxPj4nTWMWRgs5CSbQxf9', // BonkSwap Fee
 ];

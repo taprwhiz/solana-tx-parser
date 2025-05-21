@@ -70,10 +70,21 @@ export const getPubkeyString = (value: any): string => {
 export const getFinalSwap = (trades: TradeInfo[], dexInfo?: DexInfo): TradeInfo | null => {
   if (trades.length == 1) return trades[0];
   if (trades.length >= 2) {
+    // sort by idx
+    if (trades.length > 2) {
+      trades.sort((a, b) => {
+        const [aMain, aSub = '0'] = a.idx.split('-');
+        const [bMain, bSub = '0'] = b.idx.split('-');
+        const mainDiff = parseInt(aMain) - parseInt(bMain);
+        if (mainDiff !== 0) return mainDiff;
+        return parseInt(aSub) - parseInt(bSub);
+      });
+    }
+
     const inputTrade = trades[0];
     const outputTrade = trades[trades.length - 1];
 
-    if (trades.length > 2) {
+    if (trades.length >= 2) {
       // Merge trades
       let [inputAmount, outputAmount] = [0n, 0n];
       for (const trade of trades) {

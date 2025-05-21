@@ -492,10 +492,14 @@ export class TransactionAdapter {
    *     - post: TokenAmount for post-transaction balance
    *     - change: TokenAmount for net balance change
    */
-  getAccountSolBalanceChanges(): Map<string, { pre: TokenAmount; post: TokenAmount; change: TokenAmount }> {
+  getAccountSolBalanceChanges(
+    isOwner = false
+  ): Map<string, { pre: TokenAmount; post: TokenAmount; change: TokenAmount }> {
     const changes = new Map<string, { pre: TokenAmount; post: TokenAmount; change: TokenAmount }>();
 
-    this.accountKeys.forEach((accountKey, index) => {
+    this.accountKeys.forEach((key, index) => {
+      const accountKey = isOwner ? this.getTokenAccountOwner(key) || key : key;
+
       const preBalance = this.preBalances?.[index] || 0;
       const postBalance = this.postBalances?.[index] || 0;
       const change = postBalance - preBalance;
@@ -534,15 +538,16 @@ export class TransactionAdapter {
    *     - post: TokenAmount for post-transaction balance
    *     - change: TokenAmount for net balance change
    */
-  getAccountTokenBalanceChanges(): Map<
-    string,
-    Map<string, { pre: TokenAmount; post: TokenAmount; change: TokenAmount }>
-  > {
+  getAccountTokenBalanceChanges(
+    isOwner = false
+  ): Map<string, Map<string, { pre: TokenAmount; post: TokenAmount; change: TokenAmount }>> {
     const changes = new Map<string, Map<string, { pre: TokenAmount; post: TokenAmount; change: TokenAmount }>>();
 
     // Process pre token balances
     this.preTokenBalances?.forEach((balance) => {
-      const accountKey = this.accountKeys[balance.accountIndex];
+      const key = this.accountKeys[balance.accountIndex];
+      const accountKey = isOwner ? this.getTokenAccountOwner(key) || key : key;
+
       const mint = balance.mint;
       if (!mint) return;
 
@@ -568,8 +573,10 @@ export class TransactionAdapter {
 
     // Process post token balances and calculate changes
     this.postTokenBalances?.forEach((balance) => {
-      const accountKey = this.accountKeys[balance.accountIndex];
+      const key = this.accountKeys[balance.accountIndex];
+      const accountKey = isOwner ? this.getTokenAccountOwner(key) || key : key;
       const mint = balance.mint;
+
       if (!mint) return;
 
       if (!changes.has(accountKey)) {
