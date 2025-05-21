@@ -152,28 +152,41 @@ export class JupiterParser extends BaseParser {
   }
 
   private processFee(trade: TradeInfo | null) {
-    if (trade && !trade.fee) {
-      const mint = trade.outputToken.mint;
+    if (trade) {
 
-      const token =
-        mint == TOKENS.SOL
-          ? this.adapter.getAccountSolBalanceChanges(true).get(trade.user)
-          : this.adapter.getAccountTokenBalanceChanges(true).get(trade.user)?.get(mint);
+      if (!trade.fee) {
+        const mint = trade.outputToken.mint;
 
-      if (token) {
-        const feeAmount = BigInt(trade.outputToken.amountRaw) - BigInt(token.change.amount);
-        if (feeAmount > 0n) {
-          const feeUiAmount = convertToUiAmount(feeAmount, trade.outputToken.decimals);
-          // add fee
-          trade.fee = {
-            mint,
-            amount: feeUiAmount,
-            amountRaw: feeAmount.toString(),
-            decimals: trade.outputToken.decimals,
-          };
-          // update outAmount
-          trade.outputToken.amount = token.change.uiAmount || 0;
-          trade.outputToken.amountRaw = token.change.amount;
+        const token =
+          mint == TOKENS.SOL
+            ? this.adapter.getAccountSolBalanceChanges(true).get(trade.user)
+            : this.adapter.getAccountTokenBalanceChanges(true).get(trade.user)?.get(mint);
+
+        if (token) {
+          const feeAmount = BigInt(trade.outputToken.amountRaw) - BigInt(token.change.amount);
+          if (feeAmount > 0n) {
+            const feeUiAmount = convertToUiAmount(feeAmount, trade.outputToken.decimals);
+            // add fee
+            trade.fee = {
+              mint,
+              amount: feeUiAmount,
+              amountRaw: feeAmount.toString(),
+              decimals: trade.outputToken.decimals,
+            };
+            // update outAmount
+            trade.outputToken.amount = token.change.uiAmount || 0;
+            trade.outputToken.amountRaw = token.change.amount;
+          }
+        }
+      }
+
+      if (trade.inputToken.mint == TOKENS.SOL) {
+        const token = this.adapter.getAccountSolBalanceChanges(true).get(trade.user);
+        if (token) {
+          if (Math.abs(token.change.uiAmount || 0) > trade.inputToken.amount) {
+            trade.inputToken.amount = Math.abs(token.change.uiAmount || 0);
+            trade.inputToken.amountRaw = token.change.amount.replace('-', '');
+          }
         }
       }
     }
