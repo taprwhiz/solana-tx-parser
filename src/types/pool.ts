@@ -38,6 +38,11 @@ export interface PoolEvent extends PoolEventBase {
   token0AmountRaw?: string;
 
   /**
+   * User token0 balance changed amount
+   */
+  token0BalanceChange?: string;
+
+  /**
    * Token A amount (TOKEN)
    */
 
@@ -57,6 +62,11 @@ export interface PoolEvent extends PoolEventBase {
    * Token B amount (SOL/USDC/USDT)
    */
   token1AmountRaw?: string;
+
+  /**
+   * User token1 balance changed amount
+   */
+  token1BalanceChange?: string;
 
   token1Decimals?: number;
 

@@ -35,6 +35,11 @@ export const DEX_PROGRAMS = {
     name: 'JupiterDcaKeeper3',
     tags: ['route'],
   },
+  JUPITER_LIMIT_ORDER: {
+    id: 'jupoNjAxXgZ4rjzxzPMP4oxduvQsQtZzyknqvzYNrNu',
+    name: 'JupiterLimit',
+    tags: ['route'],
+  },
   JUPITER_LIMIT_ORDER_V2: {
     id: 'j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X',
     name: 'JupiterLimitV2',
@@ -58,6 +63,11 @@ export const DEX_PROGRAMS = {
   SANCTUM: {
     id: 'stkitrT1Uoy18Dk1fTrgPw8W6MVzoCfYoAFT4MLsmhq',
     name: 'Sanctum',
+    tags: ['route'],
+  },
+  PHOTON: {
+    id: 'BSfD6SHZigAfDWSjzD5Q41jw8LmKwtmjskPH9XW1mrRW',
+    name: 'Photon',
     tags: ['route'],
   },
 
@@ -300,8 +310,11 @@ export const FEE_ACCOUNTS = [
   'AVmoTthdrX6tKt4nDjco2D775W2YK3sDhxPcMmzUAmTY', // PumpfunAMM Fee6
   '62qc2CNXwrYqQScmEdiZFFAnJR262PxWEuNQtxfafNgV', // PumpfunAMM Fee7
   'JCRGumoE9Qi5BBgULTgdgTLjSgkCMSbF62ZZfGs84JeU', // PumpfunAMM Fee8
+  'CebN5WGQ4jvEPvsVU4EoHEpgzq1VV7AbicfhtW4xC9iM', // Pumpfun Fee
 
   'AVUCZyuT35YSuj4RH7fwiyPu82Djn2Hfg7y2ND2XcnZH', // Photon Fee Vault
 
   'BUX7s2ef2htTGb2KKoPHWkmzxPj4nTWMWRgs5CSbQxf9', // BonkSwap Fee
+
+  'CdQTNULjDiTsvyR5UKjYBMqWvYpxXj6HY4m6atm2hErk', // Meteora Fee Vault
 ];

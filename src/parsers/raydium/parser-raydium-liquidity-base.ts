@@ -49,7 +49,9 @@ export abstract class RaydiumLiquidityParserBase extends BaseLiquidityParser {
       const accounts = this.adapter.getInstructionAccounts(instruction);
       const type = typeof instructionType === 'string' ? instructionType : instructionType.type;
       const transfers = this.getTransfersForInstruction(programId, outerIndex, innerIndex).filter(
-        (it) => it.info.authority && accounts.includes(it.info.destination) && it.programId != TOKENS.NATIVE
+        (it) =>
+          !it.info.destination ||
+          (it.info.authority && accounts.includes(it.info.destination) && it.programId != TOKENS.NATIVE)
       );
 
       const config = this.getEventConfig(type, instructionType);

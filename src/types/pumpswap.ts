@@ -19,6 +19,9 @@ export interface PumpswapBuyEvent {
   userQuoteTokenAccount: string;
   protocolFeeRecipient: string;
   protocolFeeRecipientTokenAccount: string;
+  coinCreator: string;
+  coinCreatorFeeBasisPoints: bigint;
+  coinCreatorFee: bigint;
 }
 
 export interface PumpswapSellEvent {
@@ -42,6 +45,9 @@ export interface PumpswapSellEvent {
   userQuoteTokenAccount: string;
   protocolFeeRecipient: string;
   protocolFeeRecipientTokenAccount: string;
+  coinCreator: string;
+  coinCreatorFeeBasisPoints: bigint;
+  coinCreatorFee: bigint;
 }
 
 export interface PumpswapCreatePoolEvent {

@@ -63,6 +63,7 @@ export interface TokenInfo {
   source?: string; // Source token account
   sourceBalance?: TokenAmount; // Source balance after transfer
   sourcePreBalance?: TokenAmount; // Source balance before transfer
+  balanceChange?: string; // Raw user balance change amount, may differ from the amountRaw in some cases
 }
 
 /**
@@ -119,6 +120,16 @@ export interface TransferData {
  */
 export type TradeType = 'BUY' | 'SELL';
 
+export interface FeeInfo {
+  mint: string; // Fee token mint address
+  amount: number; // Fee amount in UI format
+  amountRaw: string; // Raw fee amount
+  decimals: number; // Fee token decimals
+  dex?: string; // DEX name (e.g., 'Raydium', 'Meteora')
+  type?: string; // Fee type (e.g., 'protocol', 'coinCreator')
+  recipient?: string; // Fee recipient account
+}
+
 /**
  * Comprehensive trade information
  */
@@ -127,9 +138,11 @@ export interface TradeInfo {
   type: TradeType; // Trade direction (BUY/SELL)
   inputToken: TokenInfo; // Token being sold
   outputToken: TokenInfo; // Token being bought
-  fee?: TokenInfo; // Fee details (if any)
+  fee?: FeeInfo; // Fee information (if applicable)
+  fees?: FeeInfo[]; // List of fees (if multiple)
   programId?: string; // DEX program ID
   amm?: string; // AMM type (e.g., 'RaydiumV4', 'Meteora')
+  amms?: string[]; // List of AMMs (if multiple)
   route?: string; // Router or Bot (e.g., 'Jupiter','OKX','BananaGun')
   slot: number; // Block slot number
   timestamp: number; // Unix timestamp

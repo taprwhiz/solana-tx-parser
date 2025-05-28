@@ -5,15 +5,15 @@ import { getAMMs, getInstructionData, getTradeType } from '../../utils';
 import { BaseParser } from '../base-parser';
 import { JupiterLimitOrderV2CreateOrderLayout, JupiterLimitOrderV2TradeLayout } from './layouts/jupiter-limit.layout';
 
-export class JupiterLimitOrderV2Parser extends BaseParser {
+export class JupiterLimitOrderParser extends BaseParser {
   public processTrades(): TradeInfo[] {
     const trades: TradeInfo[] = [];
 
     this.classifiedInstructions.forEach(({ instruction, programId, outerIndex, innerIndex }) => {
-      if (programId == DEX_PROGRAMS.JUPITER_LIMIT_ORDER_V2.id) {
+      if (programId == DEX_PROGRAMS.JUPITER_LIMIT_ORDER.id) {
         const data = getInstructionData(instruction);
         const discriminator = Buffer.from(data.slice(0, 16));
-        if (discriminator.equals(DISCRIMINATORS.JUPITER_LIMIT_ORDER_V2.TRADE_EVENT)) {
+        if (discriminator.equals(DISCRIMINATORS.JUPITER_LIMIT_ORDER.TRADE_EVENT)) {
           trades.push(this.parseFlashFilled(data, outerIndex, `${outerIndex}-${innerIndex ?? 0}`));
         }
       }
@@ -41,15 +41,15 @@ export class JupiterLimitOrderV2Parser extends BaseParser {
     // get outer instruction accounts
     const accounts = this.adapter.getInstructionAccounts(eventInstruction);
     const outerData = getInstructionData(eventInstruction);
-    const [inputToken, outputToken] = outerData.slice(0, 8).equals(DISCRIMINATORS.JUPITER_LIMIT_ORDER_V2.UNKNOWN)
+    const [inputToken, outputToken] = outerData.slice(0, 8).equals(DISCRIMINATORS.JUPITER_LIMIT_ORDER.UNKNOWN)
       ? [
-          this.adapter.splTokenMap.get(accounts[3]),
-          this.adapter.splTokenMap.get(accounts[4]), // Unknown instruction
-        ]
+        this.adapter.splTokenMap.get(accounts[3]),
+        this.adapter.splTokenMap.get(accounts[4]), // Unknown instruction
+      ]
       : [
-          this.adapter.splTokenMap.get(accounts[3]),
-          this.adapter.splTokenMap.get(accounts[5]), // FlashFillOrder instruction
-        ];
+        this.adapter.splTokenMap.get(accounts[3]),
+        this.adapter.splTokenMap.get(accounts[5]), // FlashFillOrder instruction
+      ];
 
     if (!inputToken || !outputToken) {
       throw new Error('inputToken or outputToken not found');
@@ -85,7 +85,7 @@ export class JupiterLimitOrderV2Parser extends BaseParser {
         decimals: outputDecimal ?? 0,
       },
       user: event.taker,
-      programId: DEX_PROGRAMS.JUPITER_LIMIT_ORDER_V2.id,
+      programId: DEX_PROGRAMS.JUPITER_LIMIT_ORDER.id,
       amm: this.getAmm(),
       route: this.dexInfo?.route || '',
       slot: this.adapter.slot,
@@ -99,18 +99,18 @@ export class JupiterLimitOrderV2Parser extends BaseParser {
 
   private getAmm(): string {
     const amms = getAMMs(Object.keys(this.transferActions));
-    return amms.length > 0 ? amms[0] : this.dexInfo?.amm || DEX_PROGRAMS.JUPITER_LIMIT_ORDER_V2.name;
+    return amms.length > 0 ? amms[0] : this.dexInfo?.amm || DEX_PROGRAMS.JUPITER_LIMIT_ORDER.name;
   }
 
   public processTransfers(): TransferData[] {
     const transfers: TransferData[] = [];
     this.classifiedInstructions.forEach(({ instruction, programId, outerIndex, innerIndex }) => {
-      if (programId == DEX_PROGRAMS.JUPITER_LIMIT_ORDER_V2.id) {
+      if (programId == DEX_PROGRAMS.JUPITER_LIMIT_ORDER.id) {
         const data = getInstructionData(instruction);
 
-        if (Buffer.from(data.slice(0, 16)).equals(DISCRIMINATORS.JUPITER_LIMIT_ORDER_V2.CREATE_ORDER_EVENT)) {
-          transfers.push(...this.parseInitializeOrder(data, programId, outerIndex, `${outerIndex}-${innerIndex ?? 0}`));
-        } else if (Buffer.from(data.slice(0, 8)).equals(DISCRIMINATORS.JUPITER_LIMIT_ORDER_V2.CANCEL_ORDER)) {
+        if (Buffer.from(data.slice(0, 8)).equals(DISCRIMINATORS.JUPITER_LIMIT_ORDER.CREATE_ORDER)) {
+          transfers.push(...this.parseInitializeOrder(instruction, programId, outerIndex, innerIndex));
+        } else if (Buffer.from(data.slice(0, 8)).equals(DISCRIMINATORS.JUPITER_LIMIT_ORDER.CANCEL_ORDER)) {
           transfers.push(...this.parseCancelOrder(instruction, programId, outerIndex, innerIndex));
         }
       }
@@ -122,30 +122,26 @@ export class JupiterLimitOrderV2Parser extends BaseParser {
     return transfers;
   }
 
-  private parseInitializeOrder(data: any, programId: string, outerIndex: number, idx: string): TransferData[] {
-    // find outer instruction
-    const eventInstruction = this.adapter.instructions[outerIndex];
-    if (!eventInstruction) {
-      throw new Error('Event instruction not found');
-    }
+  private parseInitializeOrder(instruction: any, programId: string, outerIndex: number, innerIndex?: number): TransferData[] {
+    // get instruction accounts
+    const accounts = this.adapter.getInstructionAccounts(instruction);
 
-    // parse event data
-    const eventData = data.slice(16);
-    const event = JupiterLimitOrderV2CreateOrderLayout.deserialize(eventData).toObject();
-
-    // get outer instruction accounts
-    const accounts = this.adapter.getInstructionAccounts(eventInstruction);
-    const user = event.maker;
-    const [source, destination] = [accounts[4], accounts[3]];
+    const [user, mint, source] = [accounts[1], accounts[5], accounts[4]];
+    const destination = mint == TOKENS.SOL ? user : accounts[3];
 
     const balance =
-      event.inputMint == TOKENS.SOL
-        ? this.adapter.getAccountSolBalanceChanges().get(user)
-        : this.adapter.getAccountTokenBalanceChanges(true).get(user)?.get(event.inputMint);
+      mint == TOKENS.SOL
+        ? this.adapter.getAccountSolBalanceChanges().get(destination)
+        : this.adapter.getAccountTokenBalanceChanges().get(destination)?.get(mint);
 
     if (!balance) return [];
 
-    const decimals = this.adapter.getTokenDecimals(event.inputMint);
+    const transfers = this.getTransfersForInstruction(programId, outerIndex, innerIndex);
+    const transfer = transfers.find((t) => t.info.mint == mint);
+
+    const decimals = transfer?.info.tokenAmount.decimals || this.adapter.getTokenDecimals(mint);
+    const tokenAmount = transfer?.info.tokenAmount.amount || balance.change.amount || '0';
+
     return [
       {
         type: 'initializeOrder',
@@ -155,16 +151,16 @@ export class JupiterLimitOrderV2Parser extends BaseParser {
           source: source,
           destination: destination,
           destinationOwner: this.adapter.getTokenAccountOwner(source),
-          mint: event.inputMint,
+          mint: mint,
           tokenAmount: {
-            amount: event.makingAmount.toString(),
-            uiAmount: convertToUiAmount(event.makingAmount, decimals),
+            amount: tokenAmount,
+            uiAmount: convertToUiAmount(tokenAmount, decimals),
             decimals: decimals,
           },
           sourceBalance: balance.post,
           sourcePreBalance: balance.pre,
         },
-        idx: idx,
+        idx: `${outerIndex}-${innerIndex ?? 0}`,
         timestamp: this.adapter.blockTime,
         signature: this.adapter.signature,
       },
@@ -180,8 +176,8 @@ export class JupiterLimitOrderV2Parser extends BaseParser {
     // get instruction accounts
     const accounts = this.adapter.getInstructionAccounts(instruction);
 
-    const [user, mint, source, authority] = [accounts[1], accounts[5], accounts[3], accounts[2]];
-    const destination = mint == TOKENS.SOL ? user : accounts[4];
+    const [user, mint, source, authority] = [accounts[2], accounts[6], accounts[1], accounts[0]];
+    const destination = mint == TOKENS.SOL ? user : accounts[3];
 
     const balance =
       mint == TOKENS.SOL

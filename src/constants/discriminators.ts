@@ -9,6 +9,13 @@ export const DISCRIMINATORS = {
     OPEN_DCA: new Uint8Array([36, 65, 185, 54, 1, 210, 100, 163]), // openDca
     OPEN_DCA_V2: new Uint8Array([142, 119, 43, 109, 162, 52, 11, 177]), // openDcaV2
   },
+  JUPITER_LIMIT_ORDER: {
+    CANCEL_ORDER: new Uint8Array([95, 129, 237, 240, 8, 49, 223, 132]), // CancelOrder
+    CREATE_ORDER: new Uint8Array([133, 110, 74, 175, 112, 159, 245, 159]), // initializeOrder
+    TRADE_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 189, 219, 127, 211, 78, 230, 97, 238]), //TradeEvent
+    UNKNOWN: new Uint8Array([232, 122, 115, 25, 199, 143, 136, 162]), // Unknown
+    FLASH_FILL_ORDER: new Uint8Array([252, 104, 18, 134, 164, 78, 18, 140]), // FlashFillOrder
+  },
   JUPITER_LIMIT_ORDER_V2: {
     CANCEL_ORDER: new Uint8Array([95, 129, 237, 240, 8, 49, 223, 132]), // CancelOrder
     CREATE_ORDER_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 49, 142, 72, 166, 230, 29, 84, 84]), // CreateOrderEvent
@@ -89,6 +96,7 @@ export const DISCRIMINATORS = {
     REMOVE_LIQUIDITY: {
       removeLiquidity: new Uint8Array([80, 85, 209, 72, 24, 206, 177, 108]), //removeLiquidity
       removeLiquidityByRange: new Uint8Array([26, 82, 102, 152, 240, 74, 105, 26]), // removeLiquidityByRange
+      removeLiquidityByRange2: new Uint8Array([204, 2, 195, 145, 53, 145, 145, 205]), // removeLiquidityByRange2
       removeAllLiquidity: new Uint8Array([10, 51, 61, 35, 112, 105, 24, 85]), // removeAllLiquidity
     },
     OTHERS: {

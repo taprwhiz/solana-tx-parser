@@ -1,6 +1,7 @@
 import { DEX_PROGRAMS } from './constants';
 import { InstructionClassifier } from './instruction-classifier';
 import {
+  JupiterLimitOrderParser,
   JupiterLimitOrderV2Parser,
   JupiterParser,
   JupiterVAParser,
@@ -113,10 +114,11 @@ export class DexParser {
   private readonly parseTransferMap: Record<string, ParserTransferConstructor> = {
     [DEX_PROGRAMS.JUPITER_DCA.id]: JupiterDcaParser,
     [DEX_PROGRAMS.JUPITER_VA.id]: JupiterVAParser,
+    [DEX_PROGRAMS.JUPITER_LIMIT_ORDER.id]: JupiterLimitOrderParser,
     [DEX_PROGRAMS.JUPITER_LIMIT_ORDER_V2.id]: JupiterLimitOrderV2Parser,
   };
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Parse transaction with specific type
@@ -200,13 +202,14 @@ export class DexParser {
           } else if (config?.tryUnknowDEX) {
             // Handle unknown DEX programs
             const transfers = Object.entries(transferActions).find(([key]) => key.startsWith(programId))?.[1];
-            if (transfers && transfers.length >= 2) {
+            if (transfers && transfers.length >= 2 && transfers.some((it) => adapter.isSupportedToken(it.info.mint))) {
               const trade = utils.processSwapData(transfers, {
                 ...dexInfo,
                 programId: programId,
                 amm: getProgramName(programId),
               });
-              if (trade) result.trades.push(trade);
+
+              if (trade) result.trades.push(utils.attachTokenTransferInfo(trade, transferActions));
             }
           }
         }
@@ -219,7 +222,7 @@ export class DexParser {
           const LiquidityParserClass = this.parseLiquidityMap[programId];
           if (LiquidityParserClass) {
             const parser = new LiquidityParserClass(adapter, transferActions, classifiedInstructions);
-            result.liquidities.push(...parser.processLiquidity());
+            result.liquidities.push(...utils.attachUserBalanceToLPs(parser.processLiquidity()));
           }
         }
       }

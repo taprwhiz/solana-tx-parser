@@ -24,7 +24,7 @@ describe('Dex Parser', () => {
 
     [
       // "2dpTLk6AQQMJUAdhNz3dK8guEDBfR3vogUkgHwDg9praDxthgsz5cAYCL4WHrnKuAWBMG3VNquSJ3W9RNbv1pVoo",
-      "3P4K2wM3JLXKFome1z4NHRauWekRmop6JgNitCAaH8nHgwoy45FJa75FnLdWDkMFumxsyZWH4rUJxpceXN68CHUW",
+      "63J7eTEJ4r41ZstUJEBTnRVdH6VZ8wmytGqnVGZCA9MLnJ8koNNaMUg43e42hMCgpvfnYZUZbhQB3kwNa1r3tD65",
       // "4WGyuUf65j9ojW6zrKf9zBEQsEfW5WiuKjdh6K2dxQAn7ggMkmT1cn1v9GuFs3Ew1d7oMJGh2z1VNvwdLQqJoC9s" // transfer
     ]
       .forEach((signature) => {
@@ -39,7 +39,7 @@ describe('Dex Parser', () => {
           const swap = getFinalSwap(trades);
           console.log('fee', fee);
           console.log('finalSwap', JSON.stringify(swap, null, 2));
-          console.log('trades', trades);
+          console.log('trades', JSON.stringify(trades, null, 2));
           console.log('liquidity', liquidities);
           console.log('transfer', JSON.stringify(transfers, null, 2));
 

@@ -153,7 +153,6 @@ export class JupiterParser extends BaseParser {
 
   private processFee(trade: TradeInfo | null) {
     if (trade) {
-
       if (!trade.fee) {
         const mint = trade.outputToken.mint;
 
@@ -174,8 +173,7 @@ export class JupiterParser extends BaseParser {
               decimals: trade.outputToken.decimals,
             };
             // update outAmount
-            trade.outputToken.amount = token.change.uiAmount || 0;
-            trade.outputToken.amountRaw = token.change.amount;
+            trade.outputToken.balanceChange = token.change.amount;
           }
         }
       }
@@ -184,8 +182,7 @@ export class JupiterParser extends BaseParser {
         const token = this.adapter.getAccountSolBalanceChanges(true).get(trade.user);
         if (token) {
           if (Math.abs(token.change.uiAmount || 0) > trade.inputToken.amount) {
-            trade.inputToken.amount = Math.abs(token.change.uiAmount || 0);
-            trade.inputToken.amountRaw = token.change.amount.replace('-', '');
+            trade.inputToken.balanceChange = token.change.amount;
           }
         }
       }

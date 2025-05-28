@@ -21,7 +21,7 @@ import {
   processTransfer,
   processTransferCheck,
 } from './transfer-utils';
-import { DexInfo, TokenInfo, TradeInfo, TransferData, TransferInfo } from './types';
+import { DexInfo, PoolEvent, TokenInfo, TradeInfo, TransferData, TransferInfo } from './types';
 import { getTradeType } from './utils';
 
 export class TransactionUtils {
@@ -77,6 +77,11 @@ export class TransactionUtils {
 
         const transferData = this.parseInstructionAction(ix, `${outerIndex}-${innerIndex}`, extraTypes);
         if (transferData) {
+          if (
+            FEE_ACCOUNTS.some((it) => [transferData.info.destination, transferData.info.destinationOwner].includes(it))
+          ) {
+            transferData.isFee = true;
+          }
           if (actions[groupKey]) {
             actions[groupKey].push(transferData);
           } else {
@@ -462,6 +467,22 @@ export class TransactionUtils {
         (it) => it.info.mint == trade.outputToken.mint && it.info.tokenAmount?.amount == trade.outputToken.amountRaw
       );
 
+    const [solChanges, tokenChanges] = [
+      this.adapter.getAccountSolBalanceChanges(false),
+      this.adapter.getAccountTokenBalanceChanges(true),
+    ];
+    const inputAmt =
+      trade.inputToken.mint == TOKENS.SOL
+        ? solChanges.get(trade.user)
+        : tokenChanges.get(trade.user)?.get(trade.inputToken.mint);
+    const outputAmt =
+      trade.outputToken.mint == TOKENS.SOL
+        ? solChanges.get(trade.user)
+        : tokenChanges.get(trade.user)?.get(trade.outputToken.mint);
+
+    trade.inputToken.balanceChange = (inputAmt?.change?.amount || trade.inputToken.amountRaw).replace('-', ''); // abs value
+    trade.outputToken.balanceChange = outputAmt?.change?.amount || trade.outputToken.amountRaw;
+
     if (inputTransfer) {
       trade.inputToken.authority = inputTransfer.info.authority;
       trade.inputToken.source = inputTransfer.info.source;
@@ -471,6 +492,9 @@ export class TransactionUtils {
       trade.inputToken.destinationPreBalance = inputTransfer.info.destinationPreBalance;
       trade.inputToken.sourceBalance = inputTransfer.info.sourceBalance;
       trade.inputToken.sourcePreBalance = inputTransfer.info.sourcePreBalance;
+    } else {
+      trade.inputToken.sourceBalance = inputAmt?.post;
+      trade.inputToken.sourcePreBalance = inputAmt?.pre;
     }
 
     if (outputTransfer) {
@@ -482,7 +506,30 @@ export class TransactionUtils {
       trade.outputToken.destinationPreBalance = outputTransfer.info.destinationPreBalance;
       trade.outputToken.sourceBalance = outputTransfer.info.sourceBalance;
       trade.outputToken.sourcePreBalance = outputTransfer.info.sourcePreBalance;
+    } else {
+      trade.outputToken.destinationBalance = outputAmt?.post;
+      trade.outputToken.destinationPreBalance = outputAmt?.pre;
     }
+
     return trade;
+  };
+
+  attachUserBalanceToLPs = (liquidities: PoolEvent[]): PoolEvent[] => {
+    liquidities.forEach((it) => {
+      const [solChanges, tokenChanges] = [
+        this.adapter.getAccountSolBalanceChanges(false),
+        this.adapter.getAccountTokenBalanceChanges(true),
+      ];
+      const solAmt = solChanges.get(it.user);
+      const [token0Amt, token1Amt] = [
+        it.token0Mint == TOKENS.SOL ? solAmt : tokenChanges.get(it.user)?.get(it.token0Mint!),
+        it.token1Mint == TOKENS.SOL ? solAmt : tokenChanges.get(it.user)?.get(it.token1Mint!),
+      ];
+
+      it.token0BalanceChange = token0Amt?.change?.amount || it.token0AmountRaw;
+      it.token1BalanceChange = token1Amt?.change?.amount || it.token1AmountRaw;
+    });
+
+    return liquidities;
   };
 }

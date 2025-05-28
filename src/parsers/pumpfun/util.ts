@@ -57,6 +57,10 @@ export const getPumpswapBuyInfo = (
     mint: string;
     decimals: number;
   },
+  feeToken: {
+    mint: string;
+    decimals: number;
+  },
   info: {
     slot: number;
     signature: string;
@@ -67,8 +71,10 @@ export const getPumpswapBuyInfo = (
 ): TradeInfo => {
   const { mint: inputMint, decimals: inputDecimal } = inputToken;
   const { mint: outputMint, decimals: ouptDecimal } = outputToken;
+  const { mint: feeMint, decimals: feeDecimal } = feeToken;
+  const feeAmt = BigInt(event.protocolFee) + BigInt(event.coinCreatorFee);
 
-  return {
+  const trade = {
     type: getTradeType(inputMint, outputMint),
     inputToken: {
       mint: inputMint,
@@ -83,11 +89,22 @@ export const getPumpswapBuyInfo = (
       decimals: ouptDecimal,
     },
     fee: {
-      mint: inputMint,
-      amount: convertToUiAmount(event.protocolFee, inputDecimal),
-      amountRaw: event.protocolFee.toString(),
-      decimals: inputDecimal,
+      mint: feeMint,
+      amount: convertToUiAmount(feeAmt, feeDecimal),
+      amountRaw: feeAmt.toString(),
+      decimals: feeDecimal,
     },
+    fees: [
+      {
+        mint: feeMint,
+        amount: convertToUiAmount(event.protocolFee, feeDecimal),
+        amountRaw: event.protocolFee.toString(),
+        decimals: feeDecimal,
+        dex: DEX_PROGRAMS.PUMP_SWAP.name,
+        type: 'protocol',
+        recipient: event.protocolFeeRecipient,
+      },
+    ],
     user: event.user,
     programId: info.dexInfo?.programId || DEX_PROGRAMS.PUMP_SWAP.id,
     amm: DEX_PROGRAMS.PUMP_SWAP.name,
@@ -96,7 +113,20 @@ export const getPumpswapBuyInfo = (
     timestamp: info.timestamp,
     signature: info.signature,
     idx: info.idx || '',
-  };
+  } as TradeInfo;
+
+  if (trade.fees && BigInt(event.coinCreatorFee) > 0) {
+    trade.fees.push({
+      mint: feeMint,
+      amount: convertToUiAmount(event.coinCreatorFee, feeDecimal),
+      amountRaw: event.coinCreatorFee.toString(),
+      decimals: feeDecimal,
+      dex: DEX_PROGRAMS.PUMP_SWAP.name,
+      type: 'coinCreator',
+      recipient: event.coinCreator,
+    });
+  }
+  return trade;
 };
 
 export const getPumpswapSellInfo = (
@@ -106,6 +136,10 @@ export const getPumpswapSellInfo = (
     decimals: number;
   },
   outputToken: {
+    mint: string;
+    decimals: number;
+  },
+  feeToken: {
     mint: string;
     decimals: number;
   },
@@ -119,7 +153,10 @@ export const getPumpswapSellInfo = (
 ): TradeInfo => {
   const { mint: inputMint, decimals: inputDecimal } = inputToken;
   const { mint: outputMint, decimals: ouptDecimal } = outputToken;
-  return {
+  const { mint: feeMint, decimals: feeDecimal } = feeToken;
+  const feeAmt = BigInt(event.protocolFee) + BigInt(event.coinCreatorFee);
+
+  const trade = {
     type: getTradeType(inputMint, outputMint),
     inputToken: {
       mint: inputMint,
@@ -134,11 +171,23 @@ export const getPumpswapSellInfo = (
       decimals: ouptDecimal,
     },
     fee: {
-      mint: outputMint,
-      amount: convertToUiAmount(event.protocolFee, ouptDecimal),
+      mint: feeMint,
+      amount: convertToUiAmount(feeAmt, feeDecimal),
       amountRaw: event.protocolFee.toString(),
-      decimals: ouptDecimal,
+      decimals: feeDecimal,
+      dex: DEX_PROGRAMS.PUMP_SWAP.name,
     },
+    fees: [
+      {
+        mint: feeMint,
+        amount: convertToUiAmount(event.protocolFee, feeDecimal),
+        amountRaw: event.protocolFee.toString(),
+        decimals: feeDecimal,
+        dex: DEX_PROGRAMS.PUMP_SWAP.name,
+        type: 'protocol',
+        recipient: event.protocolFeeRecipient,
+      },
+    ],
     user: event.user,
     programId: info.dexInfo?.programId || DEX_PROGRAMS.PUMP_SWAP.id,
     amm: DEX_PROGRAMS.PUMP_SWAP.name,
@@ -147,5 +196,17 @@ export const getPumpswapSellInfo = (
     timestamp: info.timestamp,
     signature: info.signature,
     idx: info.idx || '',
-  };
+  } as TradeInfo;
+  if (trade.fees && BigInt(event.coinCreatorFee) > 0) {
+    trade.fees.push({
+      mint: feeMint,
+      amount: convertToUiAmount(event.coinCreatorFee, feeDecimal),
+      amountRaw: event.coinCreatorFee.toString(),
+      decimals: feeDecimal,
+      dex: DEX_PROGRAMS.PUMP_SWAP.name,
+      type: 'coinCreator',
+      recipient: event.coinCreator,
+    });
+  }
+  return trade;
 };

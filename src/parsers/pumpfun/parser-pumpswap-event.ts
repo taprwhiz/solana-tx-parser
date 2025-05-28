@@ -100,6 +100,9 @@ export class PumpswapEventParser {
       userQuoteTokenAccount: reader.readPubkey(),
       protocolFeeRecipient: reader.readPubkey(),
       protocolFeeRecipientTokenAccount: reader.readPubkey(),
+      coinCreator: reader.readPubkey(),
+      coinCreatorFeeBasisPoints: reader.readU64(),
+      coinCreatorFee: reader.readU64(),
     };
   }
 
@@ -127,6 +130,9 @@ export class PumpswapEventParser {
       userQuoteTokenAccount: reader.readPubkey(),
       protocolFeeRecipient: reader.readPubkey(),
       protocolFeeRecipientTokenAccount: reader.readPubkey(),
+      coinCreator: reader.readPubkey(),
+      coinCreatorFeeBasisPoints: reader.readU64(),
+      coinCreatorFee: reader.readU64(),
     };
   }
 
