@@ -137,6 +137,11 @@ export const DEX_PROGRAMS = {
     name: 'SerumV3',
     tags: ['amm', 'vault'],
   },
+  // DRIFT_V2: {
+  //   id: "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
+  //   name: 'DriftV2',
+  //   tags: ['amm', 'route'],
+  // },
 
   // Vault Programs
   METEORA_VAULT: {

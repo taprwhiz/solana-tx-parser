@@ -1,6 +1,6 @@
 import { MessageV0, PublicKey, TokenAmount } from '@solana/web3.js';
 import { SPL_TOKEN_INSTRUCTION_TYPES, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, TOKENS } from './constants';
-import { convertToUiAmount, ParseConfig, PoolEventType, SolanaTransaction, TokenInfo } from './types';
+import { BalanceChange, convertToUiAmount, ParseConfig, PoolEventType, SolanaTransaction, TokenInfo } from './types';
 import { getInstructionData, getProgramName, getPubkeyString } from './utils';
 import base58 from 'bs58';
 
@@ -492,10 +492,8 @@ export class TransactionAdapter {
    *     - post: TokenAmount for post-transaction balance
    *     - change: TokenAmount for net balance change
    */
-  getAccountSolBalanceChanges(
-    isOwner = false
-  ): Map<string, { pre: TokenAmount; post: TokenAmount; change: TokenAmount }> {
-    const changes = new Map<string, { pre: TokenAmount; post: TokenAmount; change: TokenAmount }>();
+  getAccountSolBalanceChanges(isOwner = false): Map<string, BalanceChange> {
+    const changes = new Map<string, BalanceChange>();
 
     this.accountKeys.forEach((key, index) => {
       const accountKey = isOwner ? this.getTokenAccountOwner(key) || key : key;
@@ -538,10 +536,8 @@ export class TransactionAdapter {
    *     - post: TokenAmount for post-transaction balance
    *     - change: TokenAmount for net balance change
    */
-  getAccountTokenBalanceChanges(
-    isOwner = false
-  ): Map<string, Map<string, { pre: TokenAmount; post: TokenAmount; change: TokenAmount }>> {
-    const changes = new Map<string, Map<string, { pre: TokenAmount; post: TokenAmount; change: TokenAmount }>>();
+  getAccountTokenBalanceChanges(isOwner = false): Map<string, Map<string, BalanceChange>> {
+    const changes = new Map<string, Map<string, BalanceChange>>();
 
     // Process pre token balances
     this.preTokenBalances?.forEach((balance) => {

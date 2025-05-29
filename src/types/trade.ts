@@ -108,6 +108,7 @@ export interface TransferData {
     sourcePreBalance?: TokenAmount; // Source balance before transfer
     destinationBalance?: TokenAmount; // Balance after transfer
     destinationPreBalance?: TokenAmount; // Balance before transfer
+    solBalanceChange?: string; // Raw user balance change amount
   };
   idx: string; // Instruction index
   timestamp: number; // Unix timestamp

@@ -118,7 +118,7 @@ export class DexParser {
     [DEX_PROGRAMS.JUPITER_LIMIT_ORDER_V2.id]: JupiterLimitOrderV2Parser,
   };
 
-  constructor() { }
+  constructor() {}
 
   /**
    * Parse transaction with specific type
@@ -148,6 +148,10 @@ export class DexParser {
 
       // Process fee
       result.fee = adapter.fee;
+
+      // Process user balance change
+      result.solBalanceChange = adapter.getAccountSolBalanceChanges(false)?.get(adapter.signer);
+      result.tokenBalanceChange = adapter.getAccountTokenBalanceChanges(true)?.get(adapter.signer);
 
       // Try specific parser first
       if (

@@ -24,7 +24,7 @@ describe('Dex Parser', () => {
 
     [
       // "2dpTLk6AQQMJUAdhNz3dK8guEDBfR3vogUkgHwDg9praDxthgsz5cAYCL4WHrnKuAWBMG3VNquSJ3W9RNbv1pVoo",
-      "63J7eTEJ4r41ZstUJEBTnRVdH6VZ8wmytGqnVGZCA9MLnJ8koNNaMUg43e42hMCgpvfnYZUZbhQB3kwNa1r3tD65",
+      "1z1xake7DTgJP2NByaEm43KzwGk3ReV9ooRjtqxHThxCMKsrWEM7ZeVqpJg7tHNzAuyRm74kqkH81CkLNFG9U7h",
       // "4WGyuUf65j9ojW6zrKf9zBEQsEfW5WiuKjdh6K2dxQAn7ggMkmT1cn1v9GuFs3Ew1d7oMJGh2z1VNvwdLQqJoC9s" // transfer
     ]
       .forEach((signature) => {
@@ -34,10 +34,12 @@ describe('Dex Parser', () => {
             maxSupportedTransactionVersion: 0,
           });
           if (!tx) { throw new Error(`Transaction not found > ${signature}`); }
-          const { fee, trades, liquidities, transfers } = parser.parseAll(tx);
+          const { fee, trades, liquidities, transfers, solBalanceChange, tokenBalanceChange } = parser.parseAll(tx);
           // fs.writeFileSync(`./src/__tests__/tx-${signature}.json`, JSON.stringify(tx, null, 2));
           const swap = getFinalSwap(trades);
           console.log('fee', fee);
+          console.log('solBalanceChange', solBalanceChange, 'tokenBalanceChange', tokenBalanceChange);
+          
           console.log('finalSwap', JSON.stringify(swap, null, 2));
           console.log('trades', JSON.stringify(trades, null, 2));
           console.log('liquidity', liquidities);
