@@ -100,9 +100,9 @@ export class PumpswapEventParser {
       userQuoteTokenAccount: reader.readPubkey(),
       protocolFeeRecipient: reader.readPubkey(),
       protocolFeeRecipientTokenAccount: reader.readPubkey(),
-      coinCreator: reader.readPubkey(),
-      coinCreatorFeeBasisPoints: reader.readU64(),
-      coinCreatorFee: reader.readU64(),
+      coinCreator: data.length > 304 ? reader.readPubkey() : '11111111111111111111111111111111',
+      coinCreatorFeeBasisPoints: data.length > 304 ? reader.readU64() : 0n,
+      coinCreatorFee: data.length > 304 ? reader.readU64() : 0n,
     };
   }
 
@@ -130,9 +130,9 @@ export class PumpswapEventParser {
       userQuoteTokenAccount: reader.readPubkey(),
       protocolFeeRecipient: reader.readPubkey(),
       protocolFeeRecipientTokenAccount: reader.readPubkey(),
-      coinCreator: reader.readPubkey(),
-      coinCreatorFeeBasisPoints: reader.readU64(),
-      coinCreatorFee: reader.readU64(),
+      coinCreator: data.length > 304 ? reader.readPubkey() : '11111111111111111111111111111111',
+      coinCreatorFeeBasisPoints: data.length > 304 ? reader.readU64() : 0n,
+      coinCreatorFee: data.length > 304 ? reader.readU64() : 0n,
     };
   }
 

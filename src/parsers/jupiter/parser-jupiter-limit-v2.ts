@@ -48,9 +48,8 @@ export class JupiterLimitOrderV2Parser extends BaseParser {
         ]
       : [
           this.adapter.splTokenMap.get(accounts[3]),
-          this.adapter.splTokenMap.get(accounts[5]), // FlashFillOrder instruction
+          { mint: accounts[8], decimals: this.adapter.splDecimalsMap.get(accounts[8]) }, // FlashFillOrder instruction
         ];
-
     if (!inputToken || !outputToken) {
       throw new Error('inputToken or outputToken not found');
     }

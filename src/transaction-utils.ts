@@ -92,19 +92,17 @@ export class TransactionUtils {
     });
 
     // process transfers without program
-    if (Object.keys(actions).length == 0) {
-      groupKey = 'transfer';
-      this.adapter.instructions?.forEach((ix: any, outerIndex: any) => {
-        const transferData = this.parseInstructionAction(ix, `${outerIndex}`, extraTypes);
-        if (transferData) {
-          if (actions[groupKey]) {
-            actions[groupKey].push(transferData);
-          } else {
-            actions[groupKey] = [transferData];
-          }
+    groupKey = 'transfer';
+    this.adapter.instructions?.forEach((ix: any, outerIndex: any) => {
+      const transferData = this.parseInstructionAction(ix, `${outerIndex}`, extraTypes);
+      if (transferData) {
+        if (actions[groupKey]) {
+          actions[groupKey].push(transferData);
+        } else {
+          actions[groupKey] = [transferData];
         }
-      });
-    }
+      }
+    });
 
     return actions;
   }
