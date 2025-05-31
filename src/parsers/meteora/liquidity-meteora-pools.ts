@@ -6,7 +6,12 @@ export class MeteoraPoolsParser extends MeteoraLiquidityParserBase {
   public getPoolAction(data: Buffer): PoolEventType | null {
     const instructionType = data.slice(0, 8);
     if (instructionType.equals(DISCRIMINATORS.METEORA_POOLS.CREATE)) return 'CREATE';
-    if (instructionType.equals(DISCRIMINATORS.METEORA_POOLS.ADD_LIQUIDITY)) return 'ADD';
+    if (
+      [DISCRIMINATORS.METEORA_POOLS.ADD_LIQUIDITY, DISCRIMINATORS.METEORA_POOLS.ADD_IMBALANCE_LIQUIDITY].some((it) =>
+        instructionType.equals(it)
+      )
+    )
+      return 'ADD';
     if (instructionType.equals(DISCRIMINATORS.METEORA_POOLS.REMOVE_LIQUIDITY)) return 'REMOVE';
     return null;
   }

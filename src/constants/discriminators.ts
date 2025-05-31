@@ -98,9 +98,8 @@ export const DISCRIMINATORS = {
       removeLiquidityByRange: new Uint8Array([26, 82, 102, 152, 240, 74, 105, 26]), // removeLiquidityByRange
       removeLiquidityByRange2: new Uint8Array([204, 2, 195, 145, 53, 145, 145, 205]), // removeLiquidityByRange2
       removeAllLiquidity: new Uint8Array([10, 51, 61, 35, 112, 105, 24, 85]), // removeAllLiquidity
-    },
-    OTHERS: {
       claimFee: new Uint8Array([169, 32, 79, 137, 136, 232, 70, 137]), //claimFee
+      claimFeeV2: new Uint8Array([112, 191, 101, 171, 28, 144, 127, 187]), //claimFeeV2
     },
     LIQUIDITY_EVENT: {
       compositionFeeEvent: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 128, 151, 123, 106, 17, 102, 113, 142]), //CompositionFee
@@ -114,6 +113,7 @@ export const DISCRIMINATORS = {
     CREATE: new Uint8Array([7, 166, 138, 171, 206, 171, 236, 244]), // initializePermissionlessConstantProductPoolWithConfig
     ADD_LIQUIDITY: new Uint8Array([168, 227, 50, 62, 189, 171, 84, 176]), // addBalanceLiquidity
     REMOVE_LIQUIDITY: new Uint8Array([133, 109, 44, 179, 56, 238, 114, 33]), // removeBalanceLiquidity
+    ADD_IMBALANCE_LIQUIDITY: new Uint8Array([79, 35, 122, 84, 173, 15, 93, 191]), //addImbalanceLiquidity
   },
   METEORA_DAMM: {
     INITIALIZE_POOL: new Uint8Array([95, 180, 10, 172, 84, 174, 232, 40]), // initialize_pool
