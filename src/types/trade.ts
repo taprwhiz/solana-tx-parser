@@ -149,6 +149,7 @@ export interface TradeInfo {
   timestamp: number; // Unix timestamp
   signature: string; // Transaction signature
   idx: string; // Instruction indexes
+  signer?: string; // Orignal signer
 }
 
 /**

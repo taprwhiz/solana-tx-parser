@@ -9,6 +9,7 @@ export interface PoolEventBase {
   timestamp: number;
   signature: string;
   idx: string; // instruction indexes
+  signer?: string; // Orignal signer
 }
 
 export interface PoolEvent extends PoolEventBase {

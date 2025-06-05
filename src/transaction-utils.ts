@@ -509,6 +509,8 @@ export class TransactionUtils {
       trade.outputToken.destinationPreBalance = outputAmt?.pre;
     }
 
+    trade.signer = this.adapter.signer;
+
     return trade;
   };
 
@@ -526,6 +528,8 @@ export class TransactionUtils {
 
       it.token0BalanceChange = token0Amt?.change?.amount || it.token0AmountRaw;
       it.token1BalanceChange = token1Amt?.change?.amount || it.token1AmountRaw;
+
+      it.signer = this.adapter.signer;
     });
 
     return liquidities;
