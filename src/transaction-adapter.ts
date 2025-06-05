@@ -1,8 +1,8 @@
 import { MessageV0, PublicKey, TokenAmount } from '@solana/web3.js';
+import base58 from 'bs58';
 import { SPL_TOKEN_INSTRUCTION_TYPES, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, TOKENS } from './constants';
 import { BalanceChange, convertToUiAmount, ParseConfig, PoolEventType, SolanaTransaction, TokenInfo } from './types';
 import { getInstructionData, getProgramName, getPubkeyString } from './utils';
-import base58 from 'bs58';
 
 /**
  * Adapter for unified transaction data access
@@ -105,6 +105,22 @@ export class TransactionAdapter {
     return this.getAccountKey(0);
   }
 
+  /**
+   * Get Transaction signers
+   * @returns Array of signer accounts as strings
+   */
+  get signers(): string[] {
+    const message = this.tx.transaction.message;
+    if (message instanceof MessageV0 || 'header' in message) {
+      const numRequiredSignatures = message.header.numRequiredSignatures || 1;
+      return this.accountKeys.slice(0, numRequiredSignatures);
+    } else if (this.version == 0 || this.version == 'legacy') {
+      const keys = this.getAccountKeys(this.txMessage.accountKeys.filter((it: any) => it.signer == true));
+      return keys.length > 0 ? keys : [this.signer];
+    }
+    return [this.signer];
+  }
+
   get fee(): TokenAmount {
     const fee = this.tx.meta?.fee || 0;
     return {
@@ -121,6 +137,7 @@ export class TransactionAdapter {
       const key3 = this.tx.meta?.loadedAddresses?.readonly.map((it) => getPubkeyString(it)) || [];
       return [...keys, ...key2, ...key3];
     } else if (this.version == 0) {
+      // parsed transaction
       const keys = this.getAccountKeys(this.txMessage.accountKeys) || [];
       const key2 = this.getAccountKeys(this.tx.meta?.loadedAddresses?.writable ?? []) || [];
       const key3 = this.getAccountKeys(this.tx.meta?.loadedAddresses?.readonly ?? []) || [];
@@ -168,6 +185,9 @@ export class TransactionAdapter {
     const accounts = instruction.accounts || instruction.accountKeyIndexes;
     if (accounts instanceof Buffer) {
       return this.getAccountKeys(Array.from(accounts));
+    }
+    if (typeof accounts == 'string') {
+      return this.getAccountKeys(Array.from(base58.decode(accounts)));
     }
     return this.getAccountKeys(accounts);
   }

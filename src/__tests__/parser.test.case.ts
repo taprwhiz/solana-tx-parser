@@ -530,7 +530,7 @@ export const tests = [
     type: 'BUY',
     inputToken: {
       mint: 'So11111111111111111111111111111111111111112',
-      amount: 0.000196051,
+      amount: 0.00009915,
       decimals: 9,
     },
     outputToken: {

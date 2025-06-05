@@ -2,8 +2,9 @@ import { Connection } from '@solana/web3.js';
 import dotenv from 'dotenv';
 import { DexParser } from '../dex-parser';
 import { getFinalSwap } from '../utils';
-dotenv.config();
+import fs from 'fs';
 
+dotenv.config();
 
 describe('Dex Parser', () => {
   let connection: Connection;
@@ -24,22 +25,23 @@ describe('Dex Parser', () => {
 
     [
       // "2dpTLk6AQQMJUAdhNz3dK8guEDBfR3vogUkgHwDg9praDxthgsz5cAYCL4WHrnKuAWBMG3VNquSJ3W9RNbv1pVoo",
-      "2mJJvzTUR7uasgeAq2s8n6RsEYhr6JhUEoCVoWSeJShRwDK9M8gsE35zn1d82hQBXfog6LWYEDw5zwNxZg1Zu1rC",
+      // "3874qjiBkmSNk3rRMEst2fAfwSx9jPNNi3sCcFBxETzEYxpPeRnU9emKz26M2x3ttxJGJmjV4ctZziQMFmDgKBkZ", // multiple signers
+      "3TZKJLxy4H2wQiYenuSVoQ2ox7xveRoG5bxr7yfmEdtMPqKmdHWcf5Q9B8uUBi6ystp2gQsZdP5qxiYK4JnUpm7",
       // "4WGyuUf65j9ojW6zrKf9zBEQsEfW5WiuKjdh6K2dxQAn7ggMkmT1cn1v9GuFs3Ew1d7oMJGh2z1VNvwdLQqJoC9s" // transfer
     ]
       .forEach((signature) => {
         it(`${signature} `, async () => {
-          const tx = await connection.getTransaction(signature, {
+          const tx = await connection.getParsedTransaction(signature, {
             commitment: 'confirmed',
             maxSupportedTransactionVersion: 0,
           });
           if (!tx) { throw new Error(`Transaction not found > ${signature}`); }
           const { fee, trades, liquidities, transfers, solBalanceChange, tokenBalanceChange } = parser.parseAll(tx);
-          // fs.writeFileSync(`./src/__tests__/tx-${signature}.json`, JSON.stringify(tx, null, 2));
+          // fs.writeFileSync(`./src/__tests__/tx-${signature}-parsed.json`, JSON.stringify(tx, null, 2));
           const swap = getFinalSwap(trades);
           console.log('fee', fee);
           console.log('solBalanceChange', solBalanceChange, 'tokenBalanceChange', tokenBalanceChange);
-          
+
           console.log('finalSwap', JSON.stringify(swap, null, 2));
           console.log('trades', JSON.stringify(trades, null, 2));
           console.log('liquidity', liquidities);
