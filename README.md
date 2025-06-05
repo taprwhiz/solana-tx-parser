@@ -30,6 +30,7 @@ A TypeScript library for parsing Solana DEX swap transactions. Supports multiple
   - Pumpfun AMM (Pumpswap)
 - Transfer parser support for non-trade and non-liquidity transactions
 - Comprehensive test coverage
+- Parsing result support moreEvents (Pumpfun/Pumpswap/RaydiumLaunchpad/Bootfun)
 
 ## Supported DEX Protocols
 

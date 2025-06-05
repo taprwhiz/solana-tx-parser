@@ -11,7 +11,7 @@ import {
   RaydiumLCPEvent,
   RaydiumLCPTradeEvent,
 } from '../../types';
-import { getInstructionData } from '../../utils';
+import { getInstructionData, sortByIdx } from '../../utils';
 import { PoolCreateEventLayout } from './layouts/raydium-lcp-create.layout';
 import { RaydiumLCPTradeLayout } from './layouts/raydium-lcp-trade.layout';
 
@@ -47,39 +47,41 @@ export class RaydiumLaunchpadEventParser {
   }
 
   public parseInstructions(instructions: ClassifiedInstruction[]): RaydiumLCPEvent[] {
-    return instructions
-      .map(({ instruction, outerIndex, innerIndex }) => {
-        try {
-          const data = getInstructionData(instruction);
+    return sortByIdx(
+      instructions
+        .map(({ instruction, outerIndex, innerIndex }) => {
+          try {
+            const data = getInstructionData(instruction);
 
-          for (const [type, parser] of Object.entries(this.EventsParsers)) {
-            const discriminator = Buffer.from(data.slice(0, parser.slice));
-            if (parser.discriminators.some((it) => discriminator.equals(it))) {
-              const options = {
-                instruction,
-                outerIndex,
-                innerIndex,
-              };
-              const eventData = parser.decode(data, options);
-              if (!eventData) return null;
+            for (const [type, parser] of Object.entries(this.EventsParsers)) {
+              const discriminator = Buffer.from(data.slice(0, parser.slice));
+              if (parser.discriminators.some((it) => discriminator.equals(it))) {
+                const options = {
+                  instruction,
+                  outerIndex,
+                  innerIndex,
+                };
+                const eventData = parser.decode(data, options);
+                if (!eventData) return null;
 
-              return {
-                type: type as 'TRADE' | 'CREATE' | 'COMPLETE',
-                data: eventData,
-                slot: this.adapter.slot,
-                timestamp: this.adapter.blockTime || 0,
-                signature: this.adapter.signature,
-                idx: `${outerIndex}-${innerIndex ?? 0}`,
-              };
+                return {
+                  type: type as 'TRADE' | 'CREATE' | 'COMPLETE',
+                  data: eventData,
+                  slot: this.adapter.slot,
+                  timestamp: this.adapter.blockTime || 0,
+                  signature: this.adapter.signature,
+                  idx: `${outerIndex}-${innerIndex ?? 0}`,
+                };
+              }
             }
+          } catch (error) {
+            console.error('Failed to parse RaydiumLCP event:', error);
+            throw error;
           }
-        } catch (error) {
-          console.error('Failed to parse RaydiumLCP event:', error);
-          throw error;
-        }
-        return null;
-      })
-      .filter((event): event is RaydiumLCPEvent => event !== null);
+          return null;
+        })
+        .filter((event): event is RaydiumLCPEvent => event !== null)
+    );
   }
 
   private decodeTradeInstruction(data: Buffer, options: any): RaydiumLCPTradeEvent {

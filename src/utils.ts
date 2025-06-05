@@ -67,18 +67,32 @@ export const getPubkeyString = (value: any): string => {
   return value;
 };
 
-export const getFinalSwap = (trades: TradeInfo[], dexInfo?: DexInfo): TradeInfo | null => {
-  if (trades.length == 1) return trades[0];
-  if (trades.length >= 2) {
-    // sort by idx
-    if (trades.length > 2) {
-      trades.sort((a, b) => {
+// ... existing code ...
+
+/**
+ * Sort an array of TradeInfo objects by their idx field
+ * The idx format is 'main-sub', such as '1-0', '2-1', etc.
+ * @param items The TradeInfo array to be sorted
+ * @returns The sorted TradeInfo array
+ */
+export const sortByIdx = <T extends { idx: string }>(items: T[]): T[] => {
+  return items && items.length > 1
+    ? [...items].sort((a, b) => {
         const [aMain, aSub = '0'] = a.idx.split('-');
         const [bMain, bSub = '0'] = b.idx.split('-');
         const mainDiff = parseInt(aMain) - parseInt(bMain);
         if (mainDiff !== 0) return mainDiff;
         return parseInt(aSub) - parseInt(bSub);
-      });
+      })
+    : items;
+};
+
+export const getFinalSwap = (trades: TradeInfo[], dexInfo?: DexInfo): TradeInfo | null => {
+  if (trades.length == 1) return trades[0];
+  if (trades.length >= 2) {
+    // sort by idx
+    if (trades.length > 2) {
+      trades = sortByIdx(trades);
     }
 
     const inputTrade = trades[0];

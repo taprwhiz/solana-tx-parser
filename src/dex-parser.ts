@@ -1,6 +1,7 @@
 import { DEX_PROGRAMS } from './constants';
 import { InstructionClassifier } from './instruction-classifier';
 import {
+  BoopfunEventParser,
   JupiterLimitOrderParser,
   JupiterLimitOrderV2Parser,
   JupiterParser,
@@ -12,11 +13,14 @@ import {
   MoonshotParser,
   OrcaLiquidityParser,
   OrcaParser,
+  PumpfunEventParser,
   PumpfunParser,
+  PumpswapEventParser,
   PumpswapLiquidityParser,
   PumpswapParser,
   RaydiumCLPoolParser,
   RaydiumCPMMPoolParser,
+  RaydiumLaunchpadEventParser,
   RaydiumLaunchpadParser,
   RaydiumParser,
   RaydiumV4PoolParser,
@@ -134,6 +138,7 @@ export class DexParser {
       trades: [],
       liquidities: [],
       transfers: [],
+      moreEvents: {},
     };
 
     try {
@@ -251,6 +256,9 @@ export class DexParser {
           }
         }
       }
+
+      // Process more events if needed
+      this.processMoreEvents(parseType, result, allProgramIds, adapter, transferActions, classifier);
     } catch (error) {
       if (config.thorwError) {
         throw error;
@@ -261,6 +269,42 @@ export class DexParser {
     }
 
     return result;
+  }
+
+  private processMoreEvents(
+    parseType: string,
+    result: ParseResult,
+    allProgramIds: string[],
+    adapter: TransactionAdapter,
+    transferActions: Record<string, TransferData[]>,
+    classifier: InstructionClassifier
+  ) {
+    if (parseType === 'all') {
+      if (allProgramIds.includes(DEX_PROGRAMS.PUMP_FUN.id)) {
+        result.moreEvents[DEX_PROGRAMS.PUMP_FUN.name] = new PumpfunEventParser(adapter).parseInstructions(
+          classifier.getInstructions(DEX_PROGRAMS.PUMP_FUN.id)
+        );
+      }
+
+      if (allProgramIds.includes(DEX_PROGRAMS.PUMP_SWAP.id)) {
+        result.moreEvents[DEX_PROGRAMS.PUMP_SWAP.name] = new PumpswapEventParser(adapter).parseInstructions(
+          classifier.getInstructions(DEX_PROGRAMS.PUMP_SWAP.id)
+        );
+      }
+
+      if (allProgramIds.includes(DEX_PROGRAMS.BOOP_FUN.id)) {
+        result.moreEvents[DEX_PROGRAMS.BOOP_FUN.name] = new BoopfunEventParser(
+          adapter,
+          transferActions
+        ).parseInstructions(classifier.getInstructions(DEX_PROGRAMS.BOOP_FUN.id));
+      }
+
+      if (allProgramIds.includes(DEX_PROGRAMS.RAYDIUM_LCP.id)) {
+        result.moreEvents[DEX_PROGRAMS.RAYDIUM_LCP.name] = new RaydiumLaunchpadEventParser(adapter).parseInstructions(
+          classifier.getInstructions(DEX_PROGRAMS.RAYDIUM_LCP.id)
+        );
+      }
+    }
   }
 
   /**

@@ -22,6 +22,7 @@ export interface ParseResult {
   transfers: TransferData[];
   solBalanceChange?: BalanceChange; // SOL balance change
   tokenBalanceChange?: Map<string, BalanceChange>; // token balance change, key is token mint address
+  moreEvents: Record<string, any[]>; // other events, key is Amm name
   msg?: string;
 }
 

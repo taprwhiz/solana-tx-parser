@@ -11,7 +11,7 @@ import {
   PumpfunEvent,
   PumpfunTradeEvent,
 } from '../../types';
-import { getInstructionData } from '../../utils';
+import { getInstructionData, sortByIdx } from '../../utils';
 import { BinaryReader } from '../binary-reader';
 
 export class PumpfunEventParser {
@@ -38,34 +38,36 @@ export class PumpfunEventParser {
   }
 
   public parseInstructions(instructions: ClassifiedInstruction[]): PumpfunEvent[] {
-    return instructions
-      .map(({ instruction, outerIndex, innerIndex }) => {
-        try {
-          const data = getInstructionData(instruction);
-          const discriminator = Buffer.from(data.slice(0, 16));
+    return sortByIdx(
+      instructions
+        .map(({ instruction, outerIndex, innerIndex }) => {
+          try {
+            const data = getInstructionData(instruction);
+            const discriminator = Buffer.from(data.slice(0, 16));
 
-          for (const [type, parser] of Object.entries(this.eventParsers)) {
-            if (discriminator.equals(parser.discriminator)) {
-              const eventData = parser.decode(data.slice(16));
-              if (!eventData) return null;
+            for (const [type, parser] of Object.entries(this.eventParsers)) {
+              if (discriminator.equals(parser.discriminator)) {
+                const eventData = parser.decode(data.slice(16));
+                if (!eventData) return null;
 
-              return {
-                type: type as 'TRADE' | 'CREATE' | 'COMPLETE',
-                data: eventData,
-                slot: this.adapter.slot,
-                timestamp: this.adapter.blockTime || 0,
-                signature: this.adapter.signature,
-                idx: `${outerIndex}-${innerIndex ?? 0}`,
-              };
+                return {
+                  type: type as 'TRADE' | 'CREATE' | 'COMPLETE',
+                  data: eventData,
+                  slot: this.adapter.slot,
+                  timestamp: this.adapter.blockTime || 0,
+                  signature: this.adapter.signature,
+                  idx: `${outerIndex}-${innerIndex ?? 0}`,
+                };
+              }
             }
+          } catch (error) {
+            console.error('Failed to parse Pumpfun event:', error);
+            throw error;
           }
-        } catch (error) {
-          console.error('Failed to parse Pumpfun event:', error);
-          throw error;
-        }
-        return null;
-      })
-      .filter((event): event is PumpfunEvent => event !== null);
+          return null;
+        })
+        .filter((event): event is PumpfunEvent => event !== null)
+    );
   }
 
   private decodeTradeEvent(data: Buffer): PumpfunTradeEvent {
