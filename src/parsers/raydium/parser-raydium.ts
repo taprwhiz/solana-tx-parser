@@ -21,7 +21,7 @@ export class RaydiumParser extends BaseParser {
             if (transfers.length > 2) {
               trade.fee = this.utils.getTransferTokenInfo(transfers[2]) ?? undefined;
             }
-            trades.push(trade);
+            trades.push(this.utils.attachTokenTransferInfo(trade, this.transferActions));
           }
         }
       }

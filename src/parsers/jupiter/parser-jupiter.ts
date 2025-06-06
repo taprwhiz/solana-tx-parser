@@ -15,7 +15,7 @@ export class JupiterParser extends BaseParser {
         if (event) {
           const data = this.processSwapData([event]);
           if (data) {
-            trades.push(data);
+            trades.push(this.utils.attachTokenTransferInfo(data, this.transferActions));
           }
         }
       }

@@ -16,7 +16,7 @@ export class OrcaParser extends BaseParser {
             amm: this.dexInfo.amm || getProgramName(programId),
           });
           if (trade) {
-            trades.push(trade);
+            trades.push(this.utils.attachTokenTransferInfo(trade, this.transferActions));
           }
         }
       }
