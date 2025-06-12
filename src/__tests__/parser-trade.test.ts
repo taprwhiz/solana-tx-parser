@@ -26,7 +26,7 @@ describe('Dex Parser', () => {
 
     [
 
-      "2fCNJ8hUhwayV8aZfPYhTUNKoFyVTvzUL53UvyMyk6eiXHqgEzG5PVBnW8h46mW14hDR8cZgDKBD6kdBBj7vcrKC",
+      "46LXprwoWwkLVvQVix4SMLPKMDH7chnMiP9j7JjaZj5w48ypjMQCpA271a866hcwsXnEq2KqXdbgjmZV5rj6XsoG",
       // "3874qjiBkmSNk3rRMEst2fAfwSx9jPNNi3sCcFBxETzEYxpPeRnU9emKz26M2x3ttxJGJmjV4ctZziQMFmDgKBkZ", // multiple signers
       // "3Dd6Hr9AFFearu8MZ8V3Ukm2dAbWLQ3ZUbxTvfLBw1UtghqSc1mEsrgdcbqVYQrfozTy9wNYaHQoE5FqXqfTvHA", // pumpfun
       // "5pBu3T3iguqLpgtKTmhfiik13EruLVKNa28ZMtkrE2hhcM1hM1D7aNn7vgiqQsahFTaw6kiJiPre6suJAJdKrK2y", //pumpswap
@@ -36,7 +36,7 @@ describe('Dex Parser', () => {
     ]
       .forEach((signature) => {
         it(`${signature} `, async () => {
-          const tx = await connection.getParsedTransaction(signature, {
+          const tx = await connection.getTransaction(signature, {
             commitment: 'confirmed',
             maxSupportedTransactionVersion: 0,
           });

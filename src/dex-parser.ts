@@ -149,8 +149,13 @@ export class DexParser {
       // Get DEX information and validate
       const dexInfo = utils.getDexInfo(classifier);
       const allProgramIds = classifier.getAllProgramIds();
-      const transferActions = utils.getTransferActions(['mintTo', 'burn', 'mintToChecked', 'burnChecked']);
 
+      if (config?.programIds && !config.programIds.some((id) => allProgramIds.includes(id))) {
+        result.state = false;
+        return result;
+      }
+
+      const transferActions = utils.getTransferActions(['mintTo', 'burn', 'mintToChecked', 'burnChecked']);
       // Process fee
       result.fee = adapter.fee;
 

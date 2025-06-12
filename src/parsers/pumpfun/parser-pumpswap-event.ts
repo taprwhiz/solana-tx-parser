@@ -19,23 +19,23 @@ export class PumpswapEventParser {
 
   private readonly eventParsers: Record<string, EventParser<any>> = {
     CREATE: {
-      discriminator: DISCRIMINATORS.PUMPSWAP.CREATE_POOL,
+      discriminator: DISCRIMINATORS.PUMPSWAP.CREATE_POOL_EVENT,
       decode: this.decodeCreateEvent.bind(this),
     },
     ADD: {
-      discriminator: DISCRIMINATORS.PUMPSWAP.ADD_LIQUIDITY,
+      discriminator: DISCRIMINATORS.PUMPSWAP.ADD_LIQUIDITY_EVENT,
       decode: this.decodeAddLiquidity.bind(this),
     },
     REMOVE: {
-      discriminator: DISCRIMINATORS.PUMPSWAP.REMOVE_LIQUIDITY,
+      discriminator: DISCRIMINATORS.PUMPSWAP.REMOVE_LIQUIDITY_EVENT,
       decode: this.decodeRemoveLiquidity.bind(this),
     },
     BUY: {
-      discriminator: DISCRIMINATORS.PUMPSWAP.BUY,
+      discriminator: DISCRIMINATORS.PUMPSWAP.BUY_EVENT,
       decode: this.decodeBuyEvent.bind(this),
     },
     SELL: {
-      discriminator: DISCRIMINATORS.PUMPSWAP.SELL,
+      discriminator: DISCRIMINATORS.PUMPSWAP.SELL_EVENT,
       decode: this.decodeSellEvent.bind(this),
     },
   };

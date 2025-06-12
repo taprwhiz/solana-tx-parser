@@ -26,6 +26,13 @@ export interface ParseResult {
   msg?: string;
 }
 
+export interface ParseShredResult {
+  state: boolean;
+  signature: string;
+  instructions: Record<string, any[]>; // instructions, key is Amm name
+  msg?: string;
+}
+
 export type EventParser<T> = {
   discriminator: Buffer | Uint8Array;
   decode: (data: Buffer) => T;
@@ -35,4 +42,9 @@ export type EventsParser<T> = {
   discriminators: (Buffer | Uint8Array)[];
   slice: number;
   decode: (data: Buffer, options: any) => T;
+};
+
+export type InstructionParser<T> = {
+  discriminator: Buffer | Uint8Array;
+  decode: (instruction: any, options: any) => T;
 };

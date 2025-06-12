@@ -31,18 +31,27 @@ export const DISCRIMINATORS = {
     WITHDRAW_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 192, 241, 201, 217, 70, 150, 90, 247]), //withdraw event
   },
   PUMPFUN: {
+    CREATE: new Uint8Array([24, 30, 200, 40, 5, 28, 7, 119]),
+    MIGRATE: new Uint8Array([155, 234, 231, 146, 236, 158, 162, 30]),
+    BUY: new Uint8Array([102, 6, 61, 18, 1, 218, 235, 234]),
+    SELL: new Uint8Array([51, 230, 133, 164, 1, 127, 131, 173]),
+
     TRADE_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 189, 219, 127, 211, 78, 230, 97, 238]),
     CREATE_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 27, 114, 169, 77, 222, 235, 99, 118]),
     COMPLETE_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 95, 114, 97, 156, 212, 46, 152, 8]),
-    BUY: new Uint8Array([102, 6, 61, 18, 1, 218, 235, 234]),
-    SELL: new Uint8Array([51, 230, 133, 164, 1, 127, 131, 173]), // SELL
   },
   PUMPSWAP: {
-    CREATE_POOL: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 177, 49, 12, 210, 160, 118, 167, 116]),
-    ADD_LIQUIDITY: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 120, 248, 61, 83, 31, 142, 107, 144]),
-    REMOVE_LIQUIDITY: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 22, 9, 133, 26, 160, 44, 71, 192]),
-    BUY: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 103, 244, 82, 31, 44, 245, 119, 119]),
-    SELL: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 62, 47, 55, 10, 165, 3, 220, 42]), // SELL
+    CREATE_POOL: new Uint8Array([233, 146, 209, 142, 207, 104, 64, 188]),
+    ADD_LIQUIDITY: new Uint8Array([242, 35, 198, 137, 82, 225, 242, 182]),
+    REMOVE_LIQUIDITY: new Uint8Array([183, 18, 70, 156, 148, 109, 161, 34]),
+    BUY: new Uint8Array([102, 6, 61, 18, 1, 218, 235, 234]),
+    SELL: new Uint8Array([51, 230, 133, 164, 1, 127, 131, 173]),
+
+    CREATE_POOL_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 177, 49, 12, 210, 160, 118, 167, 116]),
+    ADD_LIQUIDITY_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 120, 248, 61, 83, 31, 142, 107, 144]),
+    REMOVE_LIQUIDITY_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 22, 9, 133, 26, 160, 44, 71, 192]),
+    BUY_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 103, 244, 82, 31, 44, 245, 119, 119]),
+    SELL_EVENT: new Uint8Array([228, 69, 165, 46, 81, 203, 154, 29, 62, 47, 55, 10, 165, 3, 220, 42]),
   },
   MOONSHOT: {
     BUY: new Uint8Array([102, 6, 61, 18, 1, 218, 235, 234]),

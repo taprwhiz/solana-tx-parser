@@ -2,7 +2,7 @@ import { MessageV0, PublicKey, TokenAmount } from '@solana/web3.js';
 import base58 from 'bs58';
 import { SPL_TOKEN_INSTRUCTION_TYPES, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, TOKENS } from './constants';
 import { BalanceChange, convertToUiAmount, ParseConfig, PoolEventType, SolanaTransaction, TokenInfo } from './types';
-import { getInstructionData, getProgramName, getPubkeyString } from './utils';
+import { decodeInstructionData, getInstructionData, getProgramName, getPubkeyString } from './utils';
 
 /**
  * Adapter for unified transaction data access
@@ -151,6 +151,14 @@ export class TransactionAdapter {
     }
   }
 
+  get addressTableLookups() {
+    return this.txMessage.addressTableLookups || [];
+  }
+
+  get addressTableLookupKeys() {
+    return this.getAccountKeys(this.addressTableLookups.map((it: any) => it.accountKey)) || [];
+  }
+
   /**
    * Get unified instruction data
    */
@@ -160,7 +168,7 @@ export class TransactionAdapter {
     return {
       programId: isParsed ? getPubkeyString(instruction.programId) : this.accountKeys[instruction.programIdIndex],
       accounts: this.getInstructionAccounts(instruction),
-      data: 'data' in instruction ? instruction.data : '',
+      data: 'data' in instruction ? decodeInstructionData(instruction.data) : '',
       parsed: 'parsed' in instruction ? instruction.parsed : undefined,
       program: instruction.program || '',
     };
@@ -171,23 +179,30 @@ export class TransactionAdapter {
   }
 
   getAccountKeys(accounts: any[]): string[] {
-    return accounts?.map((it: any) => {
-      if (it instanceof PublicKey) return it.toBase58();
-      if (typeof it == 'string') return it;
-      if (typeof it == 'number') return this.accountKeys[it];
-      if ('pubkey' in it) return getPubkeyString(it.pubkey);
-      if (it instanceof Buffer) return base58.encode(it);
-      return it;
-    });
+    return accounts && accounts.length
+      ? accounts.map((it: any) => {
+          if (it instanceof PublicKey) return it.toBase58();
+          if (typeof it == 'string') return it;
+          if (typeof it == 'number') return this.accountKeys[it];
+          if ('pubkey' in it) return getPubkeyString(it.pubkey);
+          if (it instanceof Buffer) return base58.encode(it);
+          if ('type' in it && it.type == 'Buffer') return base58.encode(it.data);
+          if (Array.isArray(it)) return base58.encode(it);
+          return it;
+        })
+      : [];
   }
 
   getInstructionAccounts(instruction: any): string[] {
     const accounts = instruction.accounts || instruction.accountKeyIndexes;
+    if (typeof accounts == 'string') {
+      return this.getAccountKeys(Array.from(base58.decode(accounts)));
+    }
     if (accounts instanceof Buffer) {
       return this.getAccountKeys(Array.from(accounts));
     }
-    if (typeof accounts == 'string') {
-      return this.getAccountKeys(Array.from(base58.decode(accounts)));
+    if ('type' in accounts && accounts.type == 'Buffer') {
+      return this.getAccountKeys(Array.from(accounts.data));
     }
     return this.getAccountKeys(accounts);
   }

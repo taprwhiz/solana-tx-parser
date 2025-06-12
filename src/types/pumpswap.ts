@@ -114,9 +114,16 @@ export interface PumpswapWithdrawEvent {
 
 export interface PumpswapEvent {
   type: 'BUY' | 'SELL' | 'CREATE' | 'ADD' | 'REMOVE';
-  data: PumpswapBuyEvent | PumpswapSellEvent | PumpswapCreatePoolEvent | PumpswapDepositEvent | PumpswapWithdrawEvent;
+  data:
+    | PumpswapBuyEvent
+    | PumpswapSellEvent
+    | PumpswapCreatePoolEvent
+    | PumpswapDepositEvent
+    | PumpswapWithdrawEvent
+    | any;
   slot: number;
   timestamp: number;
   signature: string;
   idx: string; // instruction indexes
+  signer?: string[];
 }

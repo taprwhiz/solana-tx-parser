@@ -8,10 +8,16 @@ import { PublicKey } from '@solana/web3.js';
  */
 export const getInstructionData = (instruction: any): Buffer => {
   if ('data' in instruction) {
-    if (typeof instruction.data === 'string') return Buffer.from(base58.decode(instruction.data)); // compatible with both bs58 v4.0.1 and v6.0.0
-    if (instruction.data instanceof Uint8Array) return Buffer.from(instruction.data);
+    return decodeInstructionData(instruction.data);
   }
   return instruction.data;
+};
+
+export const decodeInstructionData = (data: any): Buffer => {
+  if (typeof data === 'string') return Buffer.from(base58.decode(data)); // compatible with both bs58 v4.0.1 and v6.0.0
+  if (data instanceof Uint8Array) return Buffer.from(data);
+  if ('type' in data && data.type == 'Buffer') return Buffer.from(data.data);
+  return data;
 };
 
 /**

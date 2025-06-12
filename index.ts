@@ -8,3 +8,4 @@ export * from './src/transfer-utils';
 export * from './src/transfer-compiled-utils';
 export * from './src/instruction-classifier';
 export * from './src/dex-parser';
+export * from './src/shred-parser';
