@@ -47,7 +47,6 @@ export class ShredParser {
       result.signature = adapter.signature;
 
       if (config?.programIds && !config.programIds.some((id) => allProgramIds.includes(id))) {
-        result.state = false;
         return result;
       }
 

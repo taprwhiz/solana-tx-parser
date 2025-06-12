@@ -9,7 +9,7 @@ export class PumpfunInstructionParser {
   constructor(
     private readonly adapter: TransactionAdapter,
     private readonly classifier: InstructionClassifier
-  ) { }
+  ) {}
 
   private readonly instructionParsers: Record<string, InstructionParser<any>> = {
     CREATE: {
@@ -42,10 +42,9 @@ export class PumpfunInstructionParser {
           try {
             const data = getInstructionData(instruction);
             const discriminator = Buffer.from(data.slice(0, 8));
-
             for (const [type, parser] of Object.entries(this.instructionParsers)) {
               if (discriminator.equals(parser.discriminator)) {
-                const eventData = parser.decode(instruction, { data: data });
+                const eventData = parser.decode(instruction, { data: data.slice(8) });
                 if (!eventData) return null;
 
                 const event = {
@@ -61,7 +60,7 @@ export class PumpfunInstructionParser {
               }
             }
           } catch (error) {
-            console.error('Failed to parse Pumpswap instruction:', error);
+            console.error('Failed to parse Pumpfun instruction:', this.adapter.signature, error);
             throw error;
           }
           return null;

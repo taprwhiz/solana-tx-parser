@@ -49,7 +49,7 @@ export class PumpswapInstructionParser {
 
             for (const [type, parser] of Object.entries(this.instructionParsers)) {
               if (discriminator.equals(parser.discriminator)) {
-                const eventData = parser.decode(instruction, { data: data });
+                const eventData = parser.decode(instruction, { data: data.slice(8) });
                 if (!eventData) return null;
 
                 const event = {
