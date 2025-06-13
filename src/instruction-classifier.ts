@@ -23,8 +23,8 @@ export class InstructionClassifier {
     // innerInstructions
     const innerInstructions = this.adapter.innerInstructions;
     if (innerInstructions) {
-      innerInstructions.forEach((set) => {
-        set.instructions.forEach((instruction, innerIndex) => {
+      innerInstructions.forEach((set: any) => {
+        set.instructions.forEach((instruction: any, innerIndex: any) => {
           const programId = this.adapter.getInstructionProgramId(instruction);
           this.addInstruction({
             instruction,

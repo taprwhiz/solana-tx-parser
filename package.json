@@ -1,12 +1,12 @@
 {
-  "name": "solana-dex-parser",
-  "version": "2.5.5",
-  "description": "Solana Dex Transaction Parser",
+  "name": "solana-dextrade-parser",
+  "version": "3.2.5",
+  "description": "Solana Dextrade transaction Parser",
   "author": "cxcx",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "github:cxcx-ai/solana-dex-parser"
+    "url": "github:taprwhiz/solana-tx-parser"
   },
   "keywords": [
     "solana",
@@ -47,13 +47,14 @@
   },
   "dependencies": {
     "@solana/web3.js": "^1.87.0",
+    "chunk-validation": "^2.1.2",
     "dotenv": "^16.4.7"
   },
   "devDependencies": {
     "@types/bs58": "^4.0.4",
     "@types/jest": "^29.5.0",
     "@types/json-bigint": "^1.0.4",
-    "@types/node": "^20.0.0",
+    "@types/node": "^20.19.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.0.0",

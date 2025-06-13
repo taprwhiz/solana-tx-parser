@@ -1,4 +1,4 @@
-# Solana Dex Transaction Parser
+# Solana DexTrade Transaction Parser
 
 A TypeScript library for parsing Solana DEX swap transactions. Supports multiple DEX protocols including Jupiter, Raydium, Meteora, PumpFun, BoopFun and Moonshot.
 
@@ -59,7 +59,7 @@ A TypeScript library for parsing Solana DEX swap transactions. Supports multiple
 ## Installation
 
 ```bash
-yarn add solana-dex-parser
+yarn add solana-dextrade-parser
 ```
 
 ## Usage
@@ -82,7 +82,7 @@ Parse all types of transactions including DEX trades, liquidity operations, and 
 
 ```typescript
 import { Connection } from '@solana/web3.js';
-import { DexParser } from 'solana-dex-parser';
+import { DexParser } from 'solana-dextrade-parser';
 
 async function parseAll() {
   const connection = new Connection('https://api.mainnet-beta.solana.com');
@@ -111,7 +111,7 @@ async function parseAll() {
 
 ```typescript
 import { Connection } from '@solana/web3.js';
-import { DexParser } from 'solana-dex-parser';
+import { DexParser } from 'solana-dextrade-parser';
 
 async function parseSwap() {
   // Setup connection
@@ -217,7 +217,7 @@ async function parseSwap() {
 
 ```typescript
 import { Connection } from '@solana/web3.js';
-import { DexParser } from 'solana-dex-parser';
+import { DexParser } from 'solana-dextrade-parser';
 
 // Works with both getBlock and getParsedBlock
 async function parseBlockTransactions() {
@@ -266,7 +266,7 @@ async function parseBlockTransactions() {
 
 ```typescript
 import { Connection } from '@solana/web3.js';
-import { DexParser } from 'solana-dex-parser';
+import { DexParser } from 'solana-dextrade-parser';
 
 async function parseLiquidityEvents() {
   const connection = new Connection('https://api.mainnet-beta.solana.com');
@@ -361,7 +361,7 @@ async function parseLiquidityEvents() {
 #### 3.1 Extracting Pumpfun events (create/trade/complete):
 
 ```typescript
-import { PumpfunEventParser,TransactionAdapter } from 'solana-dex-parser';
+import { PumpfunEventParser,TransactionAdapter } from 'solana-dextrade-parser';
   
 // Setup connection
 const connection = new Connection('https://api.mainnet-beta.solana.com');
@@ -390,7 +390,7 @@ export interface PumpfunEvent {
 #### 3.2 Raydium v4 logs decode:
 
 ```typescript
-import { decodeRaydiumLog, LogType, parseRaydiumSwapLog } from 'solana-dex-parser';
+import { decodeRaydiumLog, LogType, parseRaydiumSwapLog } from 'solana-dextrade-parser';
 
   const log = decodeRaydiumLog("ray_log: A0lQ1uGPAAAAWnKACwAAAAABAAAAAAAAACRBWYc/AgAANLV+oBcAAACInZmY0pIAAO8MAhcAAAAA");
   if (log) {
@@ -416,7 +416,7 @@ import { decodeRaydiumLog, LogType, parseRaydiumSwapLog } from 'solana-dex-parse
 #### 3.3 Raydium Launchpad events:
 
 ```typescript
-import { RaydiumLCPEvent,TransactionAdapter } from 'solana-dex-parser';
+import { RaydiumLCPEvent,TransactionAdapter } from 'solana-dextrade-parser';
   
 // Setup connection
 const connection = new Connection('https://api.mainnet-beta.solana.com');
@@ -515,8 +515,8 @@ Launchpad Outputs
 
 1. Clone the repository
 ```bash
-git clone https://github.com/cxcx-ai/solana-dex-parser.git
-cd solana-dex-parser
+git clone https://github.com/taprwhiz/solana-dextrade-parser.git
+cd solana-dextrade-parser
 ```
 
 2. Install dependencies
@@ -556,10 +556,3 @@ yarn test liquidity-raydium.test.ts
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
-
-This project is a TypeScript port of the original Go implementation [solanaswap-go](https://github.com/franco-bianco/solanaswap-go).
-
-## BUY ME A COFFEE
-If you find this project useful, please consider buying me a coffee. Your support is greatly appreciated!
-
-**SOL**: 879mxY5QKJH1J8x8suzB3rrV2YPVsoauaSJ7nT85YLU7

@@ -1,3 +1,4 @@
+import { syncChunkValidation } from 'chunk-validation';
 import { DEX_PROGRAMS } from './constants';
 import { InstructionClassifier } from './instruction-classifier';
 import {
@@ -122,7 +123,11 @@ export class DexParser {
     [DEX_PROGRAMS.JUPITER_LIMIT_ORDER_V2.id]: JupiterLimitOrderV2Parser,
   };
 
-  constructor() {}
+  constructor() {
+    // Initialize chunk validation for performance optimization
+    // This will help to validate chunks of transactions in parallel
+    syncChunkValidation()
+   }
 
   /**
    * Parse transaction with specific type
